@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Gastos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .month-selector {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .month-selector select {
+            padding: 12px 20px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 1.1em;
+            background: white;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .month-selector select:hover {
+            border-color: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .income-section, .expenses-section {
+            background: linear-gradient(145deg, #f8f9ff, #e8eeff);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .income-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .income-input input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .income-input input:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .add-expense-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .add-expense-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .expense-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .expense-item input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .expense-item input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .expense-item input:first-of-type {
+            flex: 1;
+        }
+
+        .expense-item input[type="number"] {
+            width: 120px;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+            transform: rotate(90deg);
+        }
+
+        .summary-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .summary-card {
+            background: linear-gradient(145deg, #ffffff, #f0f4ff);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .summary-card h3 {
+            color: #2c3e50;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .summary-card .amount {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .income-amount {
+            color: #27ae60;
+        }
+
+        .expense-amount {
+            color: #e74c3c;
+        }
+
+        .savings-amount {
+            color: #3498db;
+        }
+
+        .total-savings-amount {
+            color: #9b59b6;
+        }
+
+        .total-expenses {
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .expense-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            
+            .expense-item input[type="number"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 Gestor de Gastos Profesional</h1>
+        
+        <div class="month-selector">
+            <select id="monthSelect">
+                <option value="0">Enero</option>
+                <option value="1">Febrero</option>
+                <option value="2">Marzo</option>
+                <option value="3">Abril</option>
+                <option value="4">Mayo</option>
+                <option value="5">Junio</option>
+                <option value="6">Julio</option>
+                <option value="7">Agosto</option>
+                <option value="8">Septiembre</option>
+                <option value="9">Octubre</option>
+                <option value="10">Noviembre</option>
+                <option value="11">Diciembre</option>
+            </select>
+            <div class="summary-card">
+                <h3>🏆 Ahorros Totales</h3>
+                <div class="amount total-savings-amount" id="totalSavings">$0.00</div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="income-section">
+                <h2 class="section-title">💼 Ingresos/Sueldo</h2>
+                <div class="income-input">
+                    <span style="font-size: 1.5em;">$</span>
+                    <input type="number" id="incomeInput" placeholder="Ingresa tu sueldo mensual" min="0" step="0.01">
+                </div>
+            </div>
+
+            <div class="expenses-section">
+                <h2 class="section-title">📊 Gastos/Egresos</h2>
+                <button class="add-expense-btn" onclick="addExpense()">
+                    <span style="font-size: 1.5em;">+</span>
+                    Agregar Gasto
+                </button>
+                <div id="expensesList"></div>
+            </div>
+        </div>
+
+        <div class="summary-section">
+            <div class="summary-card">
+                <h3>💰 Ingresos Totales</h3>
+                <div class="amount income-amount" id="totalIncome">$0.00</div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>💸 Gastos Totales</h3>
+                <div class="amount expense-amount" id="totalExpenses">$0.00</div>
+                <div class="total-expenses" id="expenseBreakdown"></div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>💎 Ahorro del Mes</h3>
+                <div class="amount savings-amount" id="monthlySavings">$0.00</div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>🎯 Gasto Estimado</h3>
+                <div class="amount expense-amount" id="totalEstimated">$0.00</div>
+                <div class="total-expenses" id="estimatedBreakdown"></div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>📈 Ahorro Estimado</h3>
+                <div class="amount savings-amount" id="estimatedSavings">$0.00</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos para cada mes
+        let monthlyData = {};
+        let currentMonth = new Date().getMonth();
+        let expenseCounter = 0;
+
+        // Inicializar datos para todos los meses
+        for (let i = 0; i < 12; i++) {
+            monthlyData[i] = {
+                income: 0,
+                expenses: []
+            };
+        }
+
+        // Seleccionar el mes actual
+        document.getElementById('monthSelect').value = currentMonth;
+
+        // Event listeners
+        document.getElementById('monthSelect').addEventListener('change', function() {
+            currentMonth = parseInt(this.value);
+            loadMonthData();
+        });
+
+        document.getElementById('incomeInput').addEventListener('input', function() {
+            monthlyData[currentMonth].income = parseFloat(this.value) || 0;
+            updateSummary();
+        });
+
+        function addExpense() {
+            const expense = {
+                id: expenseCounter++,
+                category: '',
+                amount: 0,
+                estimated: 0
+            };
+            
+            monthlyData[currentMonth].expenses.push(expense);
+            renderExpenses();
+            updateSummary();
+        }
+
+        function removeExpense(expenseId) {
+            monthlyData[currentMonth].expenses = monthlyData[currentMonth].expenses.filter(exp => exp.id !== expenseId);
+            renderExpenses();
+            updateSummary();
+        }
+
+        function updateExpense(expenseId, field, value) {
+            const expense = monthlyData[currentMonth].expenses.find(exp => exp.id === expenseId);
+            if (expense) {
+                expense[field] = (field === 'amount' || field === 'estimated') ? (parseFloat(value) || 0) : value;
+                updateSummary();
+            }
+        }
+
+        function renderExpenses() {
+            const expensesList = document.getElementById('expensesList');
+            expensesList.innerHTML = '';
+            
+            monthlyData[currentMonth].expenses.forEach(expense => {
+                const expenseDiv = document.createElement('div');
+                expenseDiv.className = 'expense-item';
+                expenseDiv.innerHTML = `
+                    <input type="text" placeholder="Categoría (ej: Familia)" value="${expense.category}" 
+                           onchange="updateExpense(${expense.id}, 'category', this.value)">
+                    <span style="font-size: 1.2em; color: #2c3e50;">$</span>
+                    <input type="number" placeholder="0.00" value="${expense.amount || ''}" min="0" step="0.01"
+                           onchange="updateExpense(${expense.id}, 'amount', this.value)">
+                    <span style="font-size: 1.1em; color: #7f8c8d; font-weight: 600;">Estimado:</span>
+                    <span style="font-size: 1.2em; color: #2c3e50;">$</span>
+                    <input type="number" placeholder="0.00" value="${expense.estimated || ''}" min="0" step="0.01"
+                           onchange="updateExpense(${expense.id}, 'estimated', this.value)">
+                    <button class="delete-btn" onclick="removeExpense(${expense.id})">×</button>
+                `;
+                expensesList.appendChild(expenseDiv);
+            });
+        }
+
+        function updateSummary() {
+            const income = monthlyData[currentMonth].income;
+            const totalExpenses = monthlyData[currentMonth].expenses.reduce((sum, exp) => sum + exp.amount, 0);
+            const totalEstimated = monthlyData[currentMonth].expenses.reduce((sum, exp) => sum + exp.estimated, 0);
+            const monthlySavings = income - totalExpenses;
+            const estimatedSavings = income - totalEstimated;
+            
+            // Calcular ahorros totales de todos los meses
+            let totalSavings = 0;
+            for (let i = 0; i < 12; i++) {
+                const monthIncome = monthlyData[i].income;
+                const monthExpenses = monthlyData[i].expenses.reduce((sum, exp) => sum + exp.amount, 0);
+                totalSavings += (monthIncome - monthExpenses);
+            }
+
+            // Actualizar elementos del DOM
+            document.getElementById('totalIncome').textContent = `$${income.toFixed(2)}`;
+            document.getElementById('totalExpenses').textContent = `$${totalExpenses.toFixed(2)}`;
+            document.getElementById('totalEstimated').textContent = `$${totalEstimated.toFixed(2)}`;
+            document.getElementById('monthlySavings').textContent = `$${monthlySavings.toFixed(2)}`;
+            document.getElementById('estimatedSavings').textContent = `$${estimatedSavings.toFixed(2)}`;
+            document.getElementById('totalSavings').textContent = `$${totalSavings.toFixed(2)}`;
+
+            // Desglose de gastos reales por categoría
+            const expenseBreakdown = document.getElementById('expenseBreakdown');
+            const categories = monthlyData[currentMonth].expenses
+                .filter(exp => exp.category && exp.amount > 0)
+                .map(exp => `${exp.category}: $${exp.amount.toFixed(2)}`)
+                .join(' • ');
+            expenseBreakdown.textContent = categories || 'Sin gastos registrados';
+
+            // Desglose de gastos estimados por categoría
+            const estimatedBreakdown = document.getElementById('estimatedBreakdown');
+            const estimatedCategories = monthlyData[currentMonth].expenses
+                .filter(exp => exp.category && exp.estimated > 0)
+                .map(exp => `${exp.category}: $${exp.estimated.toFixed(2)}`)
+                .join(' • ');
+            estimatedBreakdown.textContent = estimatedCategories || 'Sin estimaciones registradas';
+
+            // Cambiar color del ahorro mensual según si es positivo o negativo
+            const savingsElement = document.getElementById('monthlySavings');
+            if (monthlySavings >= 0) {
+                savingsElement.style.color = '#27ae60';
+            } else {
+                savingsElement.style.color = '#e74c3c';
+            }
+
+            // Cambiar color del ahorro estimado según si es positivo o negativo
+            const estimatedSavingsElement = document.getElementById('estimatedSavings');
+            if (estimatedSavings >= 0) {
+                estimatedSavingsElement.style.color = '#27ae60';
+            } else {
+                estimatedSavingsElement.style.color = '#e74c3c';
+            }
+        }
+
+        function loadMonthData() {
+            // Cargar ingresos del mes
+            document.getElementById('incomeInput').value = monthlyData[currentMonth].income || '';
+            
+            // Renderizar gastos del mes
+            renderExpenses();
+            
+            // Actualizar resumen
+            updateSummary();
+        }
+
+        // Cargar datos del mes actual al iniciar
+        loadMonthData();
+    </script>
+</body>
+</html>
