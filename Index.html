@@ -505,7 +505,8 @@
                     }
                 } else {
                     expense[field] = value;
-                    if (field === 'category' && expense.isFixed) {
+                    // Si cambió la categoría o estimado y es fija, actualizar en todos los meses
+                    if ((field === 'category' || field === 'estimated') && expense.isFixed) {
                         updateFixedCategoryInAllMonths(expense, expenseId);
                     }
                 }
@@ -584,6 +585,10 @@
                 
                 estimatedInput.addEventListener('change', function() {
                     updateExpense(expense.id, 'estimated', this.value);
+                    // Si es una categoría fija, actualizar en todos los meses
+                    if (expense.isFixed) {
+                        updateFixedCategoryInAllMonths(expense, expense.id);
+                    }
                 });
                 
                 deleteBtn.addEventListener('click', function() {
@@ -604,11 +609,5 @@
             });
         }
 
-        // Agregar categoría fija a todos los meses
-        function addFixedCategoryToAllMonths(fixedExpense) {
-            for (let month = 0; month < 12; month++) {
-                if (month !== currentMonth) {
-                    const existingExpense = monthlyData[month].expenses.find(exp => 
-                        exp.category === fixedExpense.category && exp.isFixed
-                    );
-               
+        // Agregar categoría fija a todos los meses SIGUIENTES
+      
