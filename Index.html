@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -610,4 +610,383 @@
         }
 
         // Agregar categoría fija a todos los meses SIGUIENTES
-      
+        function addFixedCategoryToAllMonths(fixedExpense) {
+            for (let month = currentMonth + 1; month < 12; month++) {
+                const existingExpense = monthlyData[month].expenses.find(exp => 
+                    exp.category === fixedExpense.category && exp.isFixed
+                );
+                
+                if (!existingExpense && fixedExpense.category) {
+                    const newExpense = {
+                        id: expenseCounter++,
+                        category: fixedExpense.category,
+                        amount: 0,
+                        estimated: fixedExpense.estimated, // Mantener el monto estimado fijo
+                        isFixed: true
+                    };
+                    monthlyData[month].expenses.push(newExpense);
+                }
+            }
+        }
+
+        // Remover categoría fija solo de los meses SIGUIENTES
+        function removeFixedCategoryFromAllMonths(removedExpense) {
+            for (let month = currentMonth + 1; month < 12; month++) {
+                monthlyData[month].expenses = monthlyData[month].expenses.filter(exp => 
+                    !(exp.category === removedExpense.category && exp.isFixed)
+                );
+            }
+        }
+
+        // Actualizar categoría fija solo en los meses SIGUIENTES
+        function updateFixedCategoryInAllMonths(updatedExpense, originalId) {
+            for (let month = currentMonth + 1; month < 12; month++) {
+                // Buscar categorías fijas con el mismo nombre
+                const existingExpenses = monthlyData[month].expenses.filter(exp => 
+                    exp.isFixed && exp.category === updatedExpense.category
+                );
+                
+                existingExpenses.forEach(existingExpense => {
+                    existingExpense.category = updatedExpense.category;
+                    existingExpense.estimated = updatedExpense.estimated; // Actualizar también el monto estimado
+                });
+            }
+        }
+
+        // Actualizar resumen
+        function updateSummary() {
+            const income = monthlyData[currentMonth].income;
+            const totalExpenses = monthlyData[currentMonth].expenses.reduce((sum, exp) => sum + exp.amount, 0);
+            const totalEstimated = monthlyData[currentMonth].expenses.reduce((sum, exp) => sum + exp.estimated, 0);
+            const monthlySavings = income - totalExpenses;
+            const estimatedSavings = income - totalEstimated;
+            
+            // Calcular ahorros totales de todos los meses
+            let totalSavings = 0;
+            for (let i = 0; i < 12; i++) {
+                const monthIncome = monthlyData[i].income;
+                const monthExpenses = monthlyData[i].expenses.reduce((sum, exp) => sum + exp.amount, 0);
+                totalSavings += (monthIncome - monthExpenses);
+            }
+
+            // Actualizar elementos del DOM
+            document.getElementById('totalIncome').textContent = '$' + income.toFixed(2);
+            document.getElementById('totalExpenses').textContent = '$' + totalExpenses.toFixed(2);
+            document.getElementById('totalEstimated').textContent = '$' + totalEstimated.toFixed(2);
+            document.getElementById('monthlySavings').textContent = '$' + monthlySavings.toFixed(2);
+            document.getElementById('estimatedSavings').textContent = '$' + estimatedSavings.toFixed(2);
+            document.getElementById('totalSavings').textContent = '$' + totalSavings.toFixed(2);
+
+            // Desglose de gastos reales por categoría
+            const expenseBreakdown = document.getElementById('expenseBreakdown');
+            const categories = monthlyData[currentMonth].expenses
+                .filter(exp => exp.category && exp.amount > 0)
+                .map(exp => exp.category + ': $' + exp.amount.toFixed(2))
+                .join(' • ');
+            expenseBreakdown.textContent = categories || 'Sin gastos registrados';
+
+            // Desglose de gastos estimados por categoría
+            const estimatedBreakdown = document.getElementById('estimatedBreakdown');
+            const estimatedCategories = monthlyData[currentMonth].expenses
+                .filter(exp => exp.category && exp.estimated > 0)
+                .map(exp => exp.category + ': $' + exp.estimated.toFixed(2))
+                .join(' • ');
+            estimatedBreakdown.textContent = estimatedCategories || 'Sin estimaciones registradas';
+
+            // Cambiar color del ahorro mensual según si es positivo o negativo
+            const savingsElement = document.getElementById('monthlySavings');
+            savingsElement.style.color = monthlySavings >= 0 ? '#27ae60' : '#e74c3c';
+
+            // Cambiar color del ahorro estimado según si es positivo o negativo
+            const estimatedSavingsElement = document.getElementById('estimatedSavings');
+            estimatedSavingsElement.style.color = estimatedSavings >= 0 ? '#27ae60' : '#e74c3c';
+        }
+
+        // Cargar datos del mes
+        function loadMonthData() {
+            document.getElementById('incomeInput').value = monthlyData[currentMonth].income || '';
+            renderExpenses();
+            updateSummary();
+            updateCharts();
+        }
+
+        // Exportar a PDF
+        function exportToPDF() {
+            try {
+                if (typeof window.jspdf === 'undefined') {
+                    alert('La librería PDF no está disponible. Inténtalo de nuevo.');
+                    return;
+                }
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                                   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                
+                doc.setFontSize(20);
+                doc.text('Reporte Financiero', 20, 30);
+                doc.setFontSize(14);
+                doc.text('Mes: ' + monthNames[currentMonth], 20, 50);
+                
+                const income = monthlyData[currentMonth].income;
+                const totalExpenses = monthlyData[currentMonth].expenses.reduce((sum, exp) => sum + exp.amount, 0);
+                const totalEstimated = monthlyData[currentMonth].expenses.reduce((sum, exp) => sum + exp.estimated, 0);
+                const savings = income - totalExpenses;
+                
+                doc.text('Ingresos: $' + income.toFixed(2), 20, 70);
+                doc.text('Gastos Totales: $' + totalExpenses.toFixed(2), 20, 85);
+                doc.text('Gastos Estimados: $' + totalEstimated.toFixed(2), 20, 100);
+                doc.text('Ahorro del Mes: $' + savings.toFixed(2), 20, 115);
+                
+                let yPosition = 135;
+                doc.text('Detalle de Gastos:', 20, yPosition);
+                yPosition += 15;
+                
+                monthlyData[currentMonth].expenses.forEach(expense => {
+                    if (expense.category && (expense.amount > 0 || expense.estimated > 0)) {
+                        const fixedText = expense.isFixed ? ' (Fija)' : '';
+                        doc.text('• ' + expense.category + fixedText + ': Real $' + expense.amount.toFixed(2) + ' / Est $' + expense.estimated.toFixed(2), 25, yPosition);
+                        yPosition += 15;
+                        if (yPosition > 270) {
+                            doc.addPage();
+                            yPosition = 30;
+                        }
+                    }
+                });
+                
+                doc.save('reporte-financiero-' + monthNames[currentMonth].toLowerCase() + '.pdf');
+            } catch (error) {
+                alert('Error al generar PDF: ' + error.message);
+                console.error('Error PDF:', error);
+            }
+        }
+
+        // Exportar a Excel
+        function exportToExcel() {
+            try {
+                if (typeof XLSX === 'undefined') {
+                    alert('La librería Excel no está disponible. Inténtalo de nuevo.');
+                    return;
+                }
+
+                const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                                   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                
+                const wb = XLSX.utils.book_new();
+                
+                const currentData = [];
+                currentData.push(['Mes', monthNames[currentMonth]]);
+                currentData.push(['Ingresos', monthlyData[currentMonth].income]);
+                
+                const totalExpenses = monthlyData[currentMonth].expenses.reduce((sum, exp) => sum + exp.amount, 0);
+                const totalEstimated = monthlyData[currentMonth].expenses.reduce((sum, exp) => sum + exp.estimated, 0);
+                
+                currentData.push(['Gastos Totales', totalExpenses]);
+                currentData.push(['Estimado Total', totalEstimated]);
+                currentData.push(['Ahorro Real', monthlyData[currentMonth].income - totalExpenses]);
+                currentData.push(['Ahorro Estimado', monthlyData[currentMonth].income - totalEstimated]);
+                currentData.push([]);
+                currentData.push(['Categoría', 'Gasto Real', 'Gasto Estimado', 'Categoría Fija']);
+                
+                monthlyData[currentMonth].expenses.forEach(expense => {
+                    if (expense.category) {
+                        currentData.push([
+                            expense.category, 
+                            expense.amount, 
+                            expense.estimated,
+                            expense.isFixed ? 'Sí' : 'No'
+                        ]);
+                    }
+                });
+                
+                const ws = XLSX.utils.aoa_to_sheet(currentData);
+                XLSX.utils.book_append_sheet(wb, ws, monthNames[currentMonth]);
+                
+                XLSX.writeFile(wb, 'finanzas-' + monthNames[currentMonth].toLowerCase() + '.xlsx');
+            } catch (error) {
+                alert('Error al generar Excel: ' + error.message);
+                console.error('Error Excel:', error);
+            }
+        }
+
+        // Actualizar gráficos
+        function updateCharts() {
+            if (typeof Chart !== 'undefined') {
+                updateExpensesChart();
+                updateSavingsChart();
+            }
+        }
+
+        // Gráfico de gastos por categoría
+        function updateExpensesChart() {
+            const ctx = document.getElementById('expensesChart').getContext('2d');
+            
+            if (expensesChart) {
+                expensesChart.destroy();
+            }
+            
+            const expenses = monthlyData[currentMonth].expenses.filter(exp => exp.category && exp.amount > 0);
+            
+            if (expenses.length === 0) {
+                ctx.font = '16px Arial';
+                ctx.fillStyle = '#7f8c8d';
+                ctx.textAlign = 'center';
+                ctx.fillText('Sin gastos para mostrar', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
+            const labels = expenses.map(exp => exp.category);
+            const data = expenses.map(exp => exp.amount);
+            const colors = generateColors(labels.length);
+            
+            expensesChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return context.label + ': $' + context.parsed.toFixed(2) + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Gráfico de ahorros por mes
+        function updateSavingsChart() {
+            const ctx = document.getElementById('savingsChart').getContext('2d');
+            
+            if (savingsChart) {
+                savingsChart.destroy();
+            }
+            
+            const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+                               'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            
+            const savingsData = [];
+            for (let i = 0; i < 12; i++) {
+                const income = monthlyData[i].income;
+                const expenses = monthlyData[i].expenses.reduce((sum, exp) => sum + exp.amount, 0);
+                savingsData.push(income - expenses);
+            }
+            
+            savingsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: monthNames,
+                    datasets: [{
+                        label: 'Ahorros por Mes',
+                        data: savingsData,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Ahorro: $' + context.parsed.y.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toFixed(0);
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Generar colores
+        function generateColors(count) {
+            const colors = [
+                '#667eea', '#764ba2', '#f093fb', '#f5576c',
+                '#4facfe', '#00f2fe', '#43e97b', '#38f9d7',
+                '#ffecd2', '#fcb69f', '#a8edea', '#fed6e3'
+            ];
+            return colors.slice(0, count);
+        }
+
+        // Inicialización cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar datos
+            initializeData();
+            
+            // Seleccionar el mes actual
+            document.getElementById('monthSelect').value = currentMonth;
+            
+            // Event listeners
+            document.getElementById('monthSelect').addEventListener('change', function() {
+                currentMonth = parseInt(this.value);
+                loadMonthData();
+            });
+
+            document.getElementById('incomeInput').addEventListener('input', function() {
+                monthlyData[currentMonth].income = parseFloat(this.value) || 0;
+                updateSummary();
+                updateCharts();
+            });
+
+            document.getElementById('addExpenseBtn').addEventListener('click', addExpense);
+            document.getElementById('exportPdfBtn').addEventListener('click', exportToPDF);
+            document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+            
+            // Cargar datos del mes actual
+            loadMonthData();
+            
+            // Inicializar gráficos después de un breve delay
+            setTimeout(function() {
+                updateCharts();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
