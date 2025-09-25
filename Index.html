@@ -8,51 +8,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
-        /* Paleta de Colores y Variables Globales */
         :root {
-            --background-color: #f5f5f7;
-            --card-background: #ffffff;
-            --primary-text-color: #1d1d1f;
-            --secondary-text-color: #6e6e73;
-            --accent-color: #007aff;
-            --accent-color-hover: #0071e3;
-            --destructive-color: #ff3b30;
-            --positive-color: #34c759;
-            --border-color: rgba(0, 0, 0, 0.1);
-            --input-background: #f0f0f2;
-            --border-radius-large: 18px;
-            --border-radius-medium: 12px;
-            --transition-speed: 0.3s;
+            --background-color: #f5f5f7; --card-background: #ffffff; --primary-text-color: #1d1d1f; --secondary-text-color: #6e6e73; --accent-color: #007aff; --accent-color-hover: #0071e3; --destructive-color: #ff3b30; --positive-color: #34c759; --border-color: rgba(0, 0, 0, 0.1); --input-background: #f0f0f2; --border-radius-large: 18px; --border-radius-medium: 12px; --transition-speed: 0.3s;
         }
-
-        /* Paleta de Modo Oscuro */
         body.dark-mode {
-            --background-color: #161618;
-            --card-background: #1c1c1e;
-            --primary-text-color: #f5f5f7;
-            --secondary-text-color: #8e8e93;
-            --border-color: rgba(255, 255, 255, 0.15);
-            --input-background: #3a3a3c;
+            --background-color: #161618; --card-background: #1c1c1e; --primary-text-color: #f5f5f7; --secondary-text-color: #8e8e93; --border-color: rgba(255, 255, 255, 0.15); --input-background: #3a3a3c;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif; 
-            background-color: var(--background-color); 
-            color: var(--primary-text-color); 
-            line-height: 1.5; 
-            -webkit-font-smoothing: antialiased;
-            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
-        }
-
-        /* --- Estructura y Cabecera --- */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif; background-color: var(--background-color); color: var(--primary-text-color); line-height: 1.5; -webkit-font-smoothing: antialiased; transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease; }
         .container { max-width: 1200px; margin: 0 auto; padding: 2.5rem; }
         .header-container { display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 2.5rem; }
         h1 { font-size: 2.8em; letter-spacing: -0.5px; margin: 0; }
         .main-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 2rem; margin-bottom: 2rem; }
-
-        /* --- Selector de Tema (Modo Oscuro/Claro) --- */
         .theme-switcher { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 8px; }
         .theme-switcher .icon { width: 22px; height: 22px; color: var(--secondary-text-color); }
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
@@ -61,30 +28,13 @@
         .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--accent-color); }
         input:checked + .slider:before { transform: translateX(20px); }
-
-        /* --- Componentes con Transiciones --- */
-        .income-section, .expenses-section, .chart-container, .summary-card { 
-            background: var(--card-background); 
-            border-radius: var(--border-radius-large); 
-            padding: 2rem; 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
-            border: 1px solid var(--border-color); 
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
-        }
+        .income-section, .expenses-section, .chart-container, .summary-card { background: var(--card-background); border-radius: var(--border-radius-large); padding: 2rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); transition: transform 0.3s ease, box-shadow 0.3s ease, background-color var(--transition-speed) ease, border-color var(--transition-speed) ease; }
         .income-section:hover, .expenses-section:hover, .chart-container:hover, .summary-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); }
-
-        input[type="number"], input[type="text"] { 
-            background-color: var(--input-background); 
-            color: var(--primary-text-color);
-            border: 1px solid transparent; 
-            border-radius: var(--border-radius-medium); 
-            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease;
-            width: 100%; padding: 0.9rem 1rem; font-size: 1rem;
-        }
+        input[type="number"], input[type="text"] { background-color: var(--input-background); color: var(--primary-text-color); border: 1px solid transparent; border-radius: var(--border-radius-medium); transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease; width: 100%; padding: 0.9rem 1rem; font-size: 1rem; }
         input:focus { border-color: var(--accent-color); outline: none; box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3); }
         
-        /* --- Estilos de Gastos (Igual que antes) --- */
-        .expense-category { border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem; transition: border-color var(--transition-speed) ease; }
+        /* Estilos de Gastos Refinados */
+        .expense-category { padding-bottom: 1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); transition: border-color var(--transition-speed) ease; }
         .expense-category:last-child { border-bottom: none; }
         .category-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .category-header-main { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
@@ -96,11 +46,10 @@
         .action-btn:hover { background-color: var(--input-background); }
         .delete-btn { background: var(--input-background); color: var(--destructive-color); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 1.5em; font-weight: 300; transition: all 0.2s ease; flex-shrink: 0; }
         .delete-btn:hover { background: var(--destructive-color); color: #fff; transform: scale(1.1); }
-        .subcategories-container { padding-left: 20px; margin-top: 1rem; display: none; }
-        details[open] .subcategories-container { display: block; }
+        .simple-inputs-container, .subcategories-container { padding: 1rem 0 0 20px; }
         .subcategory-item { display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem; padding-left: 10px; border-left: 2px solid var(--input-background); }
-        
-        /* Resto de estilos (sin cambios mayores) */
+        .input-label { font-size: 0.9em; color: var(--secondary-text-color); white-space: nowrap; }
+
         h2.section-title, .chart-container h3 { font-size: 1.4em; font-weight: 600; text-align: center; margin-bottom: 1.5rem; }
         .month-selector { text-align: center; margin-bottom: 3rem; }
         .month-selector select { background-color: var(--card-background); border: 1px solid var(--border-color); color: var(--primary-text-color); border-radius: var(--border-radius-medium); font-size: 1em; padding: 0.8rem 1.5rem; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236e6e73' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; padding-right: 3rem; transition: all var(--transition-speed) ease; }
@@ -119,7 +68,6 @@
         .summary-card h3 { font-size: 1em; font-weight: 600; color: var(--secondary-text-color); margin-bottom: 0.5rem; }
         .summary-card .amount { font-size: 2em; font-weight: 700; margin-bottom: 5px; letter-spacing: -0.5px; }
         .income-amount { color: var(--positive-color); } .expense-amount { color: var(--destructive-color); } .savings-amount { color: var(--accent-color); } .total-savings-amount { color: #5856d6; }
-        .total-expenses { font-size: 0.8em; color: var(--secondary-text-color); word-break: break-word; }
         .charts-section { margin-top: 3rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
         canvas { max-height: 350px; }
         @media (max-width: 900px) { .main-grid, .charts-section { grid-template-columns: 1fr; } .header-container { flex-direction: column; gap: 1rem; } .theme-switcher { position: static; transform: none; } }
@@ -130,15 +78,9 @@
         <div class="header-container">
             <h1>💰 Gestor de Gastos</h1>
             <div class="theme-switcher">
-                <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg>
-                <label class="switch">
-                    <input type="checkbox" id="themeToggle">
-                    <span class="slider"></span>
-                </label>
-                <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" /></svg>
+                <!-- Iconos y switch del modo oscuro -->
             </div>
         </div>
-        <!-- El resto del HTML es el mismo -->
         <div class="month-selector"><select id="monthSelect"></select></div>
         <div class="main-grid">
             <div class="income-section"><h2 class="section-title">💼 Ingresos</h2><div class="income-input"><span>$</span><input type="number" id="incomeInput" placeholder="0.00"></div></div>
@@ -150,7 +92,7 @@
     </div>
 
     <script>
-        // --- INICIO DEL SCRIPT (LÓGICA ANTERIOR INTACTA) ---
+        // --- LÓGICA DE DATOS Y FUNCIONES (igual que antes) ---
         let monthlyData = {}; let currentMonth = new Date().getMonth(); let idCounter = 0; let expensesChart = null; let savingsChart = null;
         function initializeData() { for (let i = 0; i < 12; i++) { monthlyData[i] = { income: 0, expenses: [] }; } }
         function createExpense() { return { id: idCounter++, categoryName: '', isFixed: false, isParent: false, amount: 0, estimated: 0, subcategories: [] }; }
@@ -163,85 +105,86 @@
         function findExpense(id) { return monthlyData[currentMonth].expenses.find(e => e.id === id); }
         function propagateAddition(sourceExpense) { for (let month = currentMonth + 1; month < 12; month++) { const exists = monthlyData[month].expenses.some(e => e.categoryName === sourceExpense.categoryName && e.isFixed); if (!exists) { let newExpense = JSON.parse(JSON.stringify(sourceExpense)); newExpense.id = idCounter++; newExpense.amount = 0; newExpense.subcategories.forEach(sub => { sub.id = idCounter++; sub.amount = 0; }); monthlyData[month].expenses.push(newExpense); } } }
         function propagateRemoval(sourceExpense) { for (let month = currentMonth + 1; month < 12; month++) { monthlyData[month].expenses = monthlyData[month].expenses.filter(e => !(e.categoryName === sourceExpense.categoryName && e.isFixed)); } }
-        function propagateUpdate(originalState, currentState) { for (let month = currentMonth + 1; month < 12; month++) { const targetExpense = monthlyData[month].expenses.find(e => e.categoryName === originalState.categoryName && e.isFixed); if (targetExpense) { targetExpense.categoryName = currentState.categoryName; targetExpense.estimated = currentState.estimated; targetExpense.subcategories.forEach(targetSub => { const sourceSub = currentState.subcategories.find(s => s.name === targetSub.name); if(sourceSub) { targetSub.estimated = sourceSub.estimated; } }); } } }
+        function propagateUpdate(originalState, currentState) { for (let month = currentMonth + 1; month < 12; month++) { const targetExpense = monthlyData[month].expenses.find(e => e.categoryName === originalState.categoryName && e.isFixed); if (targetExpense) { targetExpense.categoryName = currentState.categoryName; targetExpense.estimated = currentState.estimated; if(targetExpense.isParent && currentState.isParent) { currentState.subcategories.forEach(sourceSub => { let targetSub = targetExpense.subcategories.find(ts => ts.name === sourceSub.name); if(targetSub) { targetSub.estimated = sourceSub.estimated; } }); } } } }
+        
+        // --- FUNCIÓN DE RENDERIZADO CORREGIDA ---
+        function renderExpenses() {
+            const list = document.getElementById('expensesList');
+            list.innerHTML = '';
+            monthlyData[currentMonth].expenses.forEach(exp => {
+                const totalAmount = exp.isParent ? exp.subcategories.reduce((sum, s) => sum + s.amount, 0) : exp.amount;
+                
+                const categoryElement = document.createElement('div');
+                categoryElement.className = 'expense-category';
+                
+                // 1. Crear la cabecera
+                categoryElement.innerHTML = `
+                    <div class="category-header">
+                        <div class="category-header-main">
+                            <input type="text" class="category-name-input" placeholder="Nombre de Categoría" value="${exp.categoryName}">
+                            <div class="fixed-category-checkbox">
+                                <input type="checkbox" ${exp.isFixed ? 'checked' : ''}>
+                                <span>Fija</span>
+                            </div>
+                        </div>
+                        <strong class="category-total">$${totalAmount.toFixed(2)}</strong>
+                        <div class="category-controls">
+                            <button class="action-btn add-subcategory-btn">${exp.isParent ? '+ Subcategoría' : 'Detallar'}</button>
+                            <button class="delete-btn">&times;</button>
+                        </div>
+                    </div>`;
+
+                // 2. Añadir campos de entrada o subcategorías
+                if (exp.isParent) {
+                    const subcontainer = document.createElement('div');
+                    subcontainer.className = 'subcategories-container';
+                    exp.subcategories.forEach(sub => {
+                        const subElement = document.createElement('div');
+                        subElement.className = 'subcategory-item';
+                        subElement.innerHTML = `
+                            <input type="text" placeholder="Subcategoría" value="${sub.name}" data-field="name" style="flex-grow: 1;">
+                            <span class="input-label">Gasto: $</span><input type="number" placeholder="0.00" value="${sub.amount || ''}" data-field="amount" style="width: 100px;">
+                            <span class="input-label">Estimado: $</span><input type="number" placeholder="0.00" value="${sub.estimated || ''}" data-field="estimated" style="width: 100px;">
+                            <button class="delete-btn" style="width:24px; height:24px; font-size: 1.2em;">&times;</button>`;
+                        subElement.querySelectorAll('input').forEach(input => { input.onchange = (e) => updateValue(exp.id, sub.id, e.target.dataset.field, e.target.value); });
+                        subElement.querySelector('.delete-btn').onclick = () => removeElement(exp.id, sub.id);
+                        subcontainer.appendChild(subElement);
+                    });
+                    categoryElement.appendChild(subcontainer);
+                } else {
+                    const simpleInputsContainer = document.createElement('div');
+                    simpleInputsContainer.className = 'simple-inputs-container';
+                    simpleInputsContainer.innerHTML = `
+                        <div class="subcategory-item">
+                            <span class="input-label">Gasto Real: $</span>
+                            <input type="number" placeholder="0.00" value="${exp.amount || ''}" data-field="amount">
+                            <span class="input-label">Gasto Estimado: $</span>
+                            <input type="number" placeholder="0.00" value="${exp.estimated || ''}" data-field="estimated">
+                        </div>`;
+                    simpleInputsContainer.querySelectorAll('input').forEach(input => { input.onchange = (e) => updateValue(exp.id, null, e.target.dataset.field, e.target.value); });
+                    categoryElement.appendChild(simpleInputsContainer);
+                }
+
+                // 3. Conectar los eventos de la cabecera
+                categoryElement.querySelector('.category-name-input').onchange = (e) => updateValue(exp.id, null, 'categoryName', e.target.value);
+                categoryElement.querySelector('input[type="checkbox"]').onchange = (e) => updateValue(exp.id, null, 'isFixed', e.target.checked);
+                categoryElement.querySelector('.delete-btn').onclick = () => removeElement(exp.id, null);
+                const addSubBtn = categoryElement.querySelector('.add-subcategory-btn');
+                addSubBtn.onclick = exp.isParent ? () => addSubcategory(exp.id) : () => convertToParent(exp.id);
+
+                list.appendChild(categoryElement);
+            });
+        }
+        
+        // --- RESTO DEL SCRIPT (Cálculos, Gráficos, Exportación, Eventos) ---
         function render() { renderExpenses(); updateSummary(); updateCharts(); }
-        function renderExpenses() { const list = document.getElementById('expensesList'); list.innerHTML = ''; monthlyData[currentMonth].expenses.forEach(exp => { const totalAmount = exp.isParent ? exp.subcategories.reduce((sum, s) => sum + s.amount, 0) : exp.amount; const categoryElement = document.createElement('details'); categoryElement.className = 'expense-category'; categoryElement.toggleAttribute('open', exp.isParent); categoryElement.innerHTML = `<summary class="category-header"><div class="category-header-main"><input type="text" class="category-name-input" placeholder="Nombre de Categoría" value="${exp.categoryName}"><div class="fixed-category-checkbox"><input type="checkbox" ${exp.isFixed ? 'checked' : ''}><span>Fija</span></div></div><strong class="category-total">$${totalAmount.toFixed(2)}</strong><div class="category-controls">${!exp.isParent ? `<button class="action-btn add-subcategory-btn">Detallar</button>` : `<button class="action-btn add-subcategory-btn">+ Subcategoría</button>`}<button class="delete-btn">&times;</button></div></summary><div class="subcategories-container"></div>`; if (!exp.isParent) { const simpleInputs = document.createElement('div'); simpleInputs.className = 'subcategory-item'; simpleInputs.innerHTML = `<span>Gasto: $</span><input type="number" placeholder="0.00" value="${exp.amount || ''}" data-field="amount"><span>Estimado: $</span><input type="number" placeholder="0.00" value="${exp.estimated || ''}" data-field="estimated">`; categoryElement.querySelector('.category-header').insertAdjacentElement('afterend', simpleInputs); simpleInputs.querySelectorAll('input').forEach(input => { input.onchange = (e) => updateValue(exp.id, null, e.target.dataset.field, e.target.value); }); } categoryElement.querySelector('.category-name-input').onchange = (e) => updateValue(exp.id, null, 'categoryName', e.target.value); categoryElement.querySelector('input[type="checkbox"]').onchange = (e) => updateValue(exp.id, null, 'isFixed', e.target.checked); categoryElement.querySelector('.delete-btn').onclick = () => removeElement(exp.id, null); const addSubBtn = categoryElement.querySelector('.add-subcategory-btn'); if(exp.isParent) { addSubBtn.onclick = () => addSubcategory(exp.id); } else { addSubBtn.onclick = () => convertToParent(exp.id); } const subcontainer = categoryElement.querySelector('.subcategories-container'); exp.subcategories.forEach(sub => { const subElement = document.createElement('div'); subElement.className = 'subcategory-item'; subElement.innerHTML = `<input type="text" placeholder="Subcategoría" value="${sub.name}" data-field="name" style="flex-grow: 1;"><span>Gasto: $</span><input type="number" placeholder="0.00" value="${sub.amount || ''}" data-field="amount" style="width: 100px;"><span>Estimado: $</span><input type="number" placeholder="0.00" value="${sub.estimated || ''}" data-field="estimated" style="width: 100px;"><button class="delete-btn" style="width:24px; height:24px; font-size: 1.2em;">&times;</button>`; subcontainer.appendChild(subElement); subElement.querySelectorAll('input').forEach(input => { input.onchange = (e) => updateValue(exp.id, sub.id, e.target.dataset.field, e.target.value); }); subElement.querySelector('.delete-btn').onclick = () => removeElement(exp.id, sub.id); }); list.appendChild(categoryElement); }); }
         function calculateTotals() { const expenses = monthlyData[currentMonth].expenses; let totalExpenses = 0, totalEstimated = 0; expenses.forEach(exp => { if (exp.isParent) { totalExpenses += exp.subcategories.reduce((s, sub) => s + sub.amount, 0); totalEstimated += exp.subcategories.reduce((s, sub) => s + sub.estimated, 0); } else { totalExpenses += exp.amount; totalEstimated += exp.estimated; } }); return { totalExpenses, totalEstimated }; }
         function updateSummary() { const income = monthlyData[currentMonth].income; const { totalExpenses, totalEstimated } = calculateTotals(); const monthlySavings = income - totalExpenses; const estimatedSavings = income - totalEstimated; let totalSavings = 0; for(let i=0; i<12; i++) { const monthIncome = monthlyData[i].income; let monthExpenses = 0; monthlyData[i].expenses.forEach(exp => { monthExpenses += exp.isParent ? exp.subcategories.reduce((s, sub) => s + sub.amount, 0) : exp.amount; }); totalSavings += (monthIncome - monthExpenses); } document.getElementById('totalIncome').textContent = '$' + income.toFixed(2); document.getElementById('totalExpenses').textContent = '$' + totalExpenses.toFixed(2); document.getElementById('monthlySavings').textContent = '$' + monthlySavings.toFixed(2); document.getElementById('totalEstimated').textContent = '$' + totalEstimated.toFixed(2); document.getElementById('estimatedSavings').textContent = '$' + estimatedSavings.toFixed(2); document.getElementById('totalSavings').textContent = '$' + totalSavings.toFixed(2); document.getElementById('monthlySavings').style.color = monthlySavings >= 0 ? 'var(--positive-color)' : 'var(--destructive-color)'; document.getElementById('estimatedSavings').style.color = estimatedSavings >= 0 ? 'var(--positive-color)' : 'var(--destructive-color)'; }
-        
-        // --- GRÁFICOS ADAPTATIVOS ---
-        function updateCharts() {
-            if (typeof Chart === 'undefined') return;
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-            const textColor = isDarkMode ? '#f5f5f7' : '#6e6e73';
-
-            // Gráfico de Gastos
-            const expCtx = document.getElementById('expensesChart').getContext('2d');
-            if (expensesChart) expensesChart.destroy();
-            const expenseLabels = []; const expenseData = [];
-            monthlyData[currentMonth].expenses.forEach(exp => { const total = exp.isParent ? exp.subcategories.reduce((s, sub) => s + sub.amount, 0) : exp.amount; if (total > 0) { expenseLabels.push(exp.categoryName); expenseData.push(total); } });
-            if (expenseData.length > 0) { expensesChart = new Chart(expCtx, { type: 'doughnut', data: { labels: expenseLabels, datasets: [{ data: expenseData, backgroundColor: generateColors(expenseData.length), borderWidth: 2, borderColor: isDarkMode ? '#1c1c1e' : '#fff' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: textColor } } } } }); } else { expCtx.clearRect(0, 0, expCtx.canvas.width, expCtx.canvas.height); expCtx.font = '16px -apple-system'; expCtx.fillStyle = textColor; expCtx.textAlign = 'center'; expCtx.fillText('Sin gastos para mostrar', expCtx.canvas.width / 2, expCtx.canvas.height / 2); }
-            
-            // Gráfico de Ahorros
-            const savCtx = document.getElementById('savingsChart').getContext('2d');
-            if (savingsChart) savingsChart.destroy();
-            const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-            const savingsData = monthNames.map((_, i) => { let totalMonthExpenses = 0; monthlyData[i].expenses.forEach(exp => { totalMonthExpenses += exp.isParent ? exp.subcategories.reduce((s, sub) => s + sub.amount, 0) : exp.amount; }); return monthlyData[i].income - totalMonthExpenses; });
-            savingsChart = new Chart(savCtx, { type: 'line', data: { labels: monthNames, datasets: [{ label: 'Ahorros', data: savingsData, borderColor: '#007aff', backgroundColor: 'rgba(0,122,255,0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { color: gridColor }, ticks: { color: textColor } } } } });
-        }
+        function updateCharts() { if (typeof Chart === 'undefined') return; const isDarkMode = document.body.classList.contains('dark-mode'); const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'; const textColor = isDarkMode ? '#f5f5f7' : '#6e6e73'; const expCtx = document.getElementById('expensesChart').getContext('2d'); if (expensesChart) expensesChart.destroy(); const expenseLabels = []; const expenseData = []; monthlyData[currentMonth].expenses.forEach(exp => { const total = exp.isParent ? exp.subcategories.reduce((s, sub) => s + sub.amount, 0) : exp.amount; if (total > 0) { expenseLabels.push(exp.categoryName); expenseData.push(total); } }); if (expenseData.length > 0) { expensesChart = new Chart(expCtx, { type: 'doughnut', data: { labels: expenseLabels, datasets: [{ data: expenseData, backgroundColor: generateColors(expenseData.length), borderWidth: 2, borderColor: isDarkMode ? '#1c1c1e' : '#fff' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: textColor } } } } }); } else { expCtx.clearRect(0, 0, expCtx.canvas.width, expCtx.canvas.height); expCtx.font = '16px -apple-system'; expCtx.fillStyle = textColor; expCtx.textAlign = 'center'; expCtx.fillText('Sin gastos para mostrar', expCtx.canvas.width / 2, expCtx.canvas.height / 2); } const savCtx = document.getElementById('savingsChart').getContext('2d'); if (savingsChart) savingsChart.destroy(); const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']; const savingsData = monthNames.map((_, i) => { let totalMonthExpenses = 0; monthlyData[i].expenses.forEach(exp => { totalMonthExpenses += exp.isParent ? exp.subcategories.reduce((s, sub) => s + sub.amount, 0) : exp.amount; }); return monthlyData[i].income - totalMonthExpenses; }); savingsChart = new Chart(savCtx, { type: 'line', data: { labels: monthNames, datasets: [{ label: 'Ahorros', data: savingsData, borderColor: '#007aff', backgroundColor: 'rgba(0,122,255,0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { color: gridColor }, ticks: { color: textColor } } } } }); }
         function generateColors(count) { const colors = ['#007aff', '#34c759', '#ff9500', '#ff3b30', '#5856d6', '#ff2d55', '#af52de', '#5ac8fa', '#ffcc00']; let result = []; for (let i = 0; i < count; i++) result.push(colors[i % colors.length]); return result; }
-        
-        // --- LÓGICA DE EXPORTACIÓN ---
         function exportToPDF() { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.text('Reporte Financiero', 20, 20); let y = 30; monthlyData[currentMonth].expenses.forEach(exp => { const total = exp.isParent ? exp.subcategories.reduce((s, sub) => s + sub.amount, 0) : exp.amount; if (total > 0) { doc.text(`${exp.categoryName}: $${total.toFixed(2)}`, 20, y); y += 7; if(exp.isParent) { exp.subcategories.forEach(sub => { if(sub.amount > 0) { doc.text(`  - ${sub.name}: $${sub.amount.toFixed(2)}`, 25, y); y+=7; } }); } } }); doc.save('reporte.pdf'); }
         function exportToExcel() { const data = [['Categoría', 'Subcategoría', 'Gasto', 'Estimado']]; monthlyData[currentMonth].expenses.forEach(exp => { if(exp.isParent) { data.push([exp.categoryName, '', exp.subcategories.reduce((s,sub)=>s+sub.amount,0), exp.subcategories.reduce((s,sub)=>s+sub.estimated,0)]); exp.subcategories.forEach(sub => { data.push(['', sub.name, sub.amount, sub.estimated]); }); } else { data.push([exp.categoryName, '', exp.amount, exp.estimated]); } }); const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Gastos'); XLSX.writeFile(wb, 'gastos.xlsx'); }
-
-        // --- INICIALIZACIÓN Y EVENT LISTENERS ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-            const monthSelect = document.getElementById('monthSelect');
-            monthNames.forEach((name, i) => monthSelect.innerHTML += `<option value="${i}">${name}</option>`);
-            document.querySelector('.summary-section').innerHTML = `<div class="summary-card"><h3>💰 Ingresos Totales</h3><div class="amount income-amount" id="totalIncome">$0.00</div></div><div class="summary-card"><h3>💸 Gastos Totales</h3><div class="amount expense-amount" id="totalExpenses">$0.00</div></div><div class="summary-card"><h3>💎 Ahorro del Mes</h3><div class="amount savings-amount" id="monthlySavings">$0.00</div></div><div class="summary-card"><h3>🎯 Gasto Estimado</h3><div class="amount expense-amount" id="totalEstimated">$0.00</div></div><div class="summary-card"><h3>📈 Ahorro Estimado</h3><div class="amount savings-amount" id="estimatedSavings">$0.00</div></div><div class="summary-card"><h3>🏆 Ahorros Totales</h3><div class="amount total-savings-amount" id="totalSavings">$0.00</div></div>`;
-            
-            initializeData();
-            monthSelect.value = currentMonth;
-            monthSelect.onchange = (e) => { currentMonth = parseInt(e.target.value); render(); };
-            document.getElementById('incomeInput').oninput = (e) => { monthlyData[currentMonth].income = parseFloat(e.target.value) || 0; render(); };
-            document.getElementById('addExpenseBtn').onclick = addExpense;
-            document.getElementById('exportPdfBtn').onclick = exportToPDF;
-            document.getElementById('exportExcelBtn').onclick = exportToExcel;
-
-            // --- LÓGICA DEL MODO OSCURO ---
-            const themeToggle = document.getElementById('themeToggle');
-            const body = document.body;
-            
-            const setTheme = (theme) => {
-                if (theme === 'dark') {
-                    body.classList.add('dark-mode');
-                    themeToggle.checked = true;
-                } else {
-                    body.classList.remove('dark-mode');
-                    themeToggle.checked = false;
-                }
-                localStorage.setItem('theme', theme);
-                updateCharts(); // Redibuja los gráficos con los nuevos colores
-            };
-
-            themeToggle.addEventListener('change', () => {
-                setTheme(themeToggle.checked ? 'dark' : 'light');
-            });
-            
-            // Aplicar tema guardado o del sistema al cargar
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (savedTheme) {
-                setTheme(savedTheme);
-            } else if (prefersDark) {
-                setTheme('dark');
-            }
-
-            render(); // Render inicial
-        });
+        document.addEventListener('DOMContentLoaded', () => { const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']; const monthSelect = document.getElementById('monthSelect'); monthNames.forEach((name, i) => monthSelect.innerHTML += `<option value="${i}">${name}</option>`); document.querySelector('.header-container .theme-switcher').innerHTML = `<svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg><label class="switch"><input type="checkbox" id="themeToggle"><span class="slider"></span></label><svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" /></svg>`; document.querySelector('.summary-section').innerHTML = `<div class="summary-card"><h3>💰 Ingresos Totales</h3><div class="amount income-amount" id="totalIncome">$0.00</div></div><div class="summary-card"><h3>💸 Gastos Totales</h3><div class="amount expense-amount" id="totalExpenses">$0.00</div></div><div class="summary-card"><h3>💎 Ahorro del Mes</h3><div class="amount savings-amount" id="monthlySavings">$0.00</div></div><div class="summary-card"><h3>🎯 Gasto Estimado</h3><div class="amount expense-amount" id="totalEstimated">$0.00</div></div><div class="summary-card"><h3>📈 Ahorro Estimado</h3><div class="amount savings-amount" id="estimatedSavings">$0.00</div></div><div class="summary-card"><h3>🏆 Ahorros Totales</h3><div class="amount total-savings-amount" id="totalSavings">$0.00</div></div>`; initializeData(); monthSelect.value = currentMonth; monthSelect.onchange = (e) => { currentMonth = parseInt(e.target.value); render(); }; document.getElementById('incomeInput').oninput = (e) => { monthlyData[currentMonth].income = parseFloat(e.target.value) || 0; render(); }; document.getElementById('addExpenseBtn').onclick = addExpense; document.getElementById('exportPdfBtn').onclick = exportToPDF; document.getElementById('exportExcelBtn').onclick = exportToExcel; const themeToggle = document.getElementById('themeToggle'); const body = document.body; const setTheme = (theme) => { if (theme === 'dark') { body.classList.add('dark-mode'); themeToggle.checked = true; } else { body.classList.remove('dark-mode'); themeToggle.checked = false; } localStorage.setItem('theme', theme); updateCharts(); }; themeToggle.addEventListener('change', () => { setTheme(themeToggle.checked ? 'dark' : 'light'); }); const savedTheme = localStorage.getItem('theme'); const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; if (savedTheme) { setTheme(savedTheme); } else if (prefersDark) { setTheme('dark'); } render(); });
     </script>
 </body>
 </html>
